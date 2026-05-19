@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demopoli — Scheda Studente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:#C0392B; --red-dark:#96281B;
+  --cream:#F7F4EF; --dark:#1A1A18;
+  --mid:#4A4A46; --light:#9A9A94;
+  --border:#DDDBD4; --white:#FFFFFF;
+  --success:#27AE60; --warn:#E67E22;
+  --ai:#2D6A9F; --ai-light:#EBF3FB; --ai-border:#A8CCE8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
+
+.site-header{background:var(--dark);padding:0 24px;display:flex;align-items:stretch;border-bottom:3px solid var(--red);position:sticky;top:0;z-index:100;}
+.logo-block{display:flex;align-items:center;gap:14px;padding:14px 20px 14px 0;border-right:1px solid #333;margin-right:20px;}
+.logo-icon{width:38px;height:38px;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:white;letter-spacing:1px;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;color:white;letter-spacing:3px;}
+.logo-sub{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#444;transition:background 0.3s;}
+.step-dot.active{background:var(--red);}
+.step-dot.done{background:var(--success);}
+
+.container{max-width:760px;margin:0 auto;padding:40px 24px 80px;}
+.step{display:none;}
+.step.visible{display:block;animation:fadeUp 0.35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.section-hero{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px;}
+.section-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--border);line-height:1;flex-shrink:0;margin-top:-8px;}
+.section-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--dark);color:white;padding:3px 10px;margin-bottom:6px;}
+.section-tag.red{background:var(--red);}
+.section-tag.amber{background:var(--warn);}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--dark);line-height:1.1;}
+.section-desc{font-size:14px;color:var(--mid);margin-top:4px;line-height:1.5;}
+
+.progress-wrap{height:3px;background:var(--border);margin-bottom:36px;border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--red);transition:width 0.4s ease;border-radius:2px;}
+
+.intro-box{background:white;border-left:4px solid var(--red);padding:14px 18px;margin-bottom:28px;font-size:14px;line-height:1.6;color:var(--mid);}
+.intro-box strong{color:var(--dark);}
+.intro-box.amber{border-left-color:var(--warn);}
+
+.anag-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px;margin-bottom:32px;}
+.field-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--light);display:block;margin-bottom:6px;}
+input[type="text"]{width:100%;border:none;border-bottom:2px solid var(--border);padding:8px 2px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--dark);background:transparent;outline:none;transition:border-color 0.2s;}
+input[type="text"]:focus{border-color:var(--dark);}
+input[type="text"]::placeholder{color:var(--light);}
+
+.q-card{background:white;border:1.5px solid var(--border);padding:22px 24px;margin-bottom:16px;transition:border-color 0.2s;}
+.q-card:focus-within{border-color:var(--dark);}
+.q-num-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.q-badge{width:26px;height:26px;background:var(--dark);color:white;font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.q-label{font-size:15px;font-weight:500;line-height:1.45;color:var(--dark);}
+.q-hint{font-size:12.5px;font-style:italic;color:var(--light);margin-bottom:12px;line-height:1.4;padding-left:36px;}
+textarea{width:100%;border:1.5px solid var(--border);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--dark);background:var(--cream);resize:vertical;outline:none;transition:border-color 0.2s;line-height:1.6;margin-top:2px;border-radius:1px;}
+textarea:focus{border-color:var(--dark);background:white;}
+textarea::placeholder{color:var(--light);font-style:italic;}
+
+/* ── AI FEEDBACK ── */
+.ai-feedback-area{margin-top:12px;}
+.ai-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:9px 18px;border:1.5px solid var(--ai-border);background:var(--ai-light);color:var(--ai);cursor:pointer;transition:all 0.2s;border-radius:2px;}
+.ai-btn:hover{background:var(--ai);color:white;border-color:var(--ai);}
+.ai-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.ai-btn svg{width:14px;height:14px;flex-shrink:0;}
+.ai-thinking{display:none;align-items:center;gap:10px;padding:10px 14px;background:var(--ai-light);border:1.5px solid var(--ai-border);border-radius:2px;font-size:13px;color:var(--ai);margin-top:10px;}
+.ai-thinking.visible{display:flex;}
+.dots-anim span{display:inline-block;animation:blink 1.2s infinite;}
+.dots-anim span:nth-child(2){animation-delay:0.2s;}
+.dots-anim span:nth-child(3){animation-delay:0.4s;}
+@keyframes blink{0%,80%,100%{opacity:0.2;}40%{opacity:1;}}
+
+.ai-feedback-box{display:none;margin-top:10px;background:var(--ai-light);border:1.5px solid var(--ai-border);border-radius:2px;overflow:hidden;animation:fadeUp 0.3s ease;}
+.ai-feedback-box.visible{display:block;}
+.ai-feedback-header{background:var(--ai);padding:8px 14px;display:flex;align-items:center;gap:8px;}
+.ai-feedback-header-icon{font-size:16px;line-height:1;}
+.ai-feedback-header-text{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:white;}
+.ai-feedback-body{padding:14px 16px;font-size:14px;line-height:1.7;color:var(--mid);}
+.ai-feedback-body strong{color:var(--dark);}
+.ai-feedback-note{font-size:11px;color:var(--light);font-style:italic;margin-top:10px;padding-top:10px;border-top:1px dashed var(--ai-border);}
+
+.options{display:flex;flex-direction:column;gap:8px;padding-left:36px;}
+.option-label{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:14px;color:var(--mid);border-radius:1px;user-select:none;}
+.option-label:hover{border-color:var(--dark);color:var(--dark);background:#FAFAF8;}
+.option-label input[type="radio"]{display:none;}
+.option-label.selected{border-color:var(--dark);background:var(--dark);color:white;}
+.option-circle{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.option-label.selected .option-circle::after{content:'';width:7px;height:7px;border-radius:50%;background:white;display:block;}
+
+.cards-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+.game-card{border-radius:4px;overflow:hidden;border:2px solid var(--dark);box-shadow:4px 4px 0 var(--dark);}
+.game-card-header{background:var(--dark);padding:8px 14px;}
+.game-card-type{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;display:block;}
+.game-card-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;letter-spacing:1px;line-height:1.1;}
+.game-card-body{background:white;padding:12px 14px;}
+.game-card-scenario{font-size:13px;font-style:italic;color:var(--mid);border-bottom:1px dashed var(--border);padding-bottom:8px;margin-bottom:10px;line-height:1.4;}
+.pop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.pop-cell{text-align:center;border:1.5px solid var(--border);padding:10px 6px;border-radius:2px;}
+.pop-cell.hi{border-color:var(--dark);background:#F4F1EB;}
+.pop-ico{font-size:26px;display:block;line-height:1;}
+.pop-lbl{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--light);display:block;margin-top:4px;}
+.pop-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--dark);line-height:1;display:block;}
+.ob-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--light);margin-bottom:5px;}
+.ob-item{display:flex;gap:8px;align-items:flex-start;background:#F8F8F6;border-left:3px solid var(--dark);padding:6px 8px;margin-bottom:4px;font-size:13px;font-weight:600;line-height:1.35;color:var(--dark);}
+.ob-n{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--border);flex-shrink:0;line-height:1;}
+.game-card-footer{background:#F4F1EB;border-top:1px solid var(--border);padding:6px 14px;display:flex;justify-content:space-between;align-items:center;}
+.diff-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--light);}
+.diff-pips{display:flex;gap:3px;}
+.pip{width:14px;height:5px;border-radius:1px;background:var(--border);}
+.pip.on{background:var(--dark);}
+.pol-card-header{background:#4A3728;}
+.pol-cost{background:#2C2218;padding:6px 14px;display:flex;align-items:center;gap:8px;}
+.pol-cost-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#888;}
+.pol-cost-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:white;line-height:1;}
+.pol-effect{background:#F8F6F0;border-left:3px solid #4A3728;padding:6px 8px;margin-bottom:6px;font-size:13px;font-weight:700;color:var(--dark);line-height:1.35;}
+.pol-note{font-size:11px;color:var(--light);font-style:italic;line-height:1.4;}
+.pol-problem{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--light);}
+
+.paese-card{background:white;border:2px solid var(--dark);box-shadow:4px 4px 0 var(--dark);margin-bottom:24px;overflow:hidden;}
+.paese-card-header{background:var(--dark);padding:14px 18px;display:flex;align-items:center;gap:12px;}
+.paese-card-icon{font-size:32px;line-height:1;}
+.paese-card-titolo{font-family:'Bebas Neue',sans-serif;font-size:22px;color:white;letter-spacing:2px;}
+.paese-card-sottotitolo{font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.paese-card-body{padding:18px 20px;}
+.dati-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.dato{background:var(--cream);border:1.5px solid var(--border);padding:10px 14px;border-radius:2px;}
+.dato-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);display:block;margin-bottom:4px;}
+.dato-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--dark);line-height:1;display:block;}
+.dato-sub{font-size:11px;color:var(--mid);line-height:1.4;margin-top:2px;}
+.paese-desc{font-size:14px;line-height:1.65;color:var(--mid);}
+.paese-desc strong{color:var(--dark);}
+
+.obiettivi-scelta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;}
+.ob-choice{border:2px solid var(--border);padding:14px 16px;cursor:pointer;transition:all 0.18s;border-radius:2px;background:white;}
+.ob-choice:hover{border-color:var(--dark);box-shadow:3px 3px 0 var(--border);}
+.ob-choice.selected{border-color:var(--dark);background:var(--dark);color:white;box-shadow:3px 3px 0 var(--dark);}
+.ob-choice.correct{border-color:var(--success);background:#EBF7F0;color:var(--dark);}
+.ob-choice.wrong{border-color:var(--red);background:#FDF0EF;color:var(--dark);}
+.ob-choice-num{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:var(--light);display:block;margin-bottom:4px;}
+.ob-choice.selected .ob-choice-num{color:#888;}
+.ob-choice-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;line-height:1.1;margin-bottom:4px;}
+.ob-choice-pop{font-size:12px;color:var(--light);line-height:1.4;}
+.ob-choice.selected .ob-choice-pop{color:#888;}
+.ob-choice.correct .ob-choice-num,.ob-choice.correct .ob-choice-pop{color:var(--success);}
+.ob-choice.wrong .ob-choice-num,.ob-choice.wrong .ob-choice-pop{color:var(--red);}
+.conferma-btn-wrap{display:flex;justify-content:flex-end;margin-top:4px;}
+
+.reveal-box{display:none;background:white;border:2px solid var(--success);border-radius:2px;overflow:hidden;margin-top:20px;animation:fadeUp 0.4s ease;}
+.reveal-box.visible{display:block;}
+.reveal-header{background:var(--success);padding:12px 18px;display:flex;align-items:center;gap:12px;}
+.reveal-icon{font-size:28px;line-height:1;}
+.reveal-titolo{font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;letter-spacing:2px;}
+.reveal-paese{font-size:13px;color:#A8E6C0;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.reveal-body{padding:16px 18px;}
+.reveal-spiegazione{font-size:14px;line-height:1.65;color:var(--mid);}
+.reveal-spiegazione strong{color:var(--dark);}
+.reveal-wrong-note{background:#FDF0EF;border-left:3px solid var(--red);padding:8px 12px;font-size:13px;color:var(--mid);margin-bottom:12px;line-height:1.5;}
+
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);}
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:12px 28px;border:2px solid var(--dark);cursor:pointer;transition:all 0.15s;border-radius:1px;background:transparent;color:var(--dark);}
+.btn:hover{background:var(--dark);color:white;}
+.btn.primary{background:var(--dark);color:white;}
+.btn.primary:hover{background:var(--red);border-color:var(--red);}
+.btn.ghost{border-color:var(--border);color:var(--light);}
+.btn.ghost:hover{border-color:var(--mid);color:var(--mid);background:transparent;}
+.btn.send{background:var(--red);border-color:var(--red);color:white;font-size:14px;padding:14px 36px;}
+.btn.send:hover{background:var(--red-dark);border-color:var(--red-dark);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+.error-msg{font-size:12px;color:var(--red);font-weight:600;margin-top:6px;display:none;}
+.field-error input,.field-error textarea{border-color:var(--red)!important;}
+.field-error .error-msg{display:block;}
+
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.val-cell{border:1.5px solid var(--border);padding:14px 16px;background:white;}
+.val-cell-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);margin-bottom:8px;display:block;}
+
+.success-screen{display:none;text-align:center;padding:80px 24px;animation:fadeUp 0.5s ease;}
+.success-screen.visible{display:block;}
+.success-icon{width:72px;height:72px;background:var(--success);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:30px;}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:var(--dark);margin-bottom:12px;}
+.success-sub{font-size:15px;color:var(--mid);line-height:1.6;max-width:420px;margin:0 auto;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-block">
+    <div class="logo-icon">D</div>
+    <div>
+      <div class="logo-text">DEMOPOLI</div>
+      <div class="logo-sub">Scheda studente</div>
+    </div>
+  </div>
+  <div class="header-right" id="stepDots"></div>
+</header>
+
+<div class="container" id="mainContainer">
+
+  <!-- STEP 0 -->
+  <div class="step visible" id="step0">
+    <div class="section-hero">
+      <div class="section-num">0</div>
+      <div class="section-meta">
+        <div class="section-tag red">Prima di iniziare</div>
+        <div class="section-title">Chi sei?</div>
+        <div class="section-desc">Inserisci i tuoi dati, poi clicca Inizia.</div>
+      </div>
+    </div>
+    <div class="intro-box">
+      <strong>Come funziona.</strong> Hai circa 40 minuti. L'attività ha 5 sezioni: prima alcune domande sul gioco, poi scoprirai a quale situazione reale corrisponde la tua carta Demopoli, e infine ragionerai su quello che hai imparato. Le risposte arriveranno automaticamente al professore.
+    </div>
+    <div class="anag-grid">
+      <div id="f-nome"><span class="field-label">Nome e Cognome</span><input type="text" id="nome" placeholder="es. Mario Rossi" autocomplete="off"><div class="error-msg">Campo obbligatorio</div></div>
+      <div id="f-classe"><span class="field-label">Classe</span><input type="text" id="classe" placeholder="es. 3A" autocomplete="off"><div class="error-msg">Campo obbligatorio</div></div>
+      <div><span class="field-label">Data</span><input type="text" id="data" placeholder="es. 19/05/2026" autocomplete="off"></div>
+    </div>
+    <div class="nav-row"><span></span><button class="btn primary" onclick="goNext(0)">Inizia →</button></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step" id="step1">
+    <div class="progress-wrap"><div class="progress-fill" style="width:20%"></div></div>
+    <div class="section-hero">
+      <div class="section-num">1</div>
+      <div class="section-meta">
+        <div class="section-tag">Scelta multipla</div>
+        <div class="section-title">Definizioni e riconoscimento</div>
+        <div class="section-desc">Seleziona la risposta corretta per ciascuna domanda.</div>
+      </div>
+    </div>
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">1</div><div class="q-label">Nel gioco guadagni abitanti con +NATO e +IMMIGRATO, e ne perdi con −MORTO e −EMIGRATO. Nella realtà, come si chiama la differenza tra chi nasce e chi muore?</div></div>
+      <div class="options">
+        <label class="option-label" onclick="selectOpt(this,'r1','a')"><input type="radio" name="r1" value="a"><div class="option-circle"></div><span>Saldo migratorio</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r1','b')"><input type="radio" name="r1" value="b"><div class="option-circle"></div><span>Saldo naturale</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r1','c')"><input type="radio" name="r1" value="c"><div class="option-circle"></div><span>Tasso di natalità</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r1','d')"><input type="radio" name="r1" value="d"><div class="option-circle"></div><span>Indice di dipendenza</span></label>
+      </div>
+      <div class="error-msg" id="err1" style="padding-left:36px">Seleziona una risposta</div>
+    </div>
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">2</div><div class="q-label">Ogni carta obiettivo descriveva una città con una composizione diversa di bambini, adulti e anziani. Quale strumento si usa nella realtà per rappresentare questa composizione visivamente?</div></div>
+      <div class="options">
+        <label class="option-label" onclick="selectOpt(this,'r2','a')"><input type="radio" name="r2" value="a"><div class="option-circle"></div><span>Grafico a torta</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r2','b')"><input type="radio" name="r2" value="b"><div class="option-circle"></div><span>Istogramma semplice</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r2','c')"><input type="radio" name="r2" value="c"><div class="option-circle"></div><span>Piramide della popolazione</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r2','d')"><input type="radio" name="r2" value="d"><div class="option-circle"></div><span>Diagramma di flusso</span></label>
+      </div>
+      <div class="error-msg" id="err2" style="padding-left:36px">Seleziona una risposta</div>
+    </div>
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">3</div><div class="q-label">Nel gioco avere molti anziani costava soldi (Tassa Demografica). Quali sono le spese che uno Stato deve affrontare quando la sua popolazione è molto anziana?</div></div>
+      <div class="options">
+        <label class="option-label" onclick="selectOpt(this,'r3','a')"><input type="radio" name="r3" value="a"><div class="option-circle"></div><span>Spese per le scuole e per i libri di testo</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r3','b')"><input type="radio" name="r3" value="b"><div class="option-circle"></div><span>Spese per pensioni, ospedali e assistenza domiciliare</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r3','c')"><input type="radio" name="r3" value="c"><div class="option-circle"></div><span>Spese per costruire nuove strade e infrastrutture</span></label>
+        <label class="option-label" onclick="selectOpt(this,'r3','d')"><input type="radio" name="r3" value="d"><div class="option-circle"></div><span>Spese per incentivare le nuove imprese</span></label>
+      </div>
+      <div class="error-msg" id="err3" style="padding-left:36px">Seleziona una risposta</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" onclick="goBack(1)">← Indietro</button>
+      <button class="btn primary" onclick="goNext(1)">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="progress-wrap"><div class="progress-fill" style="width:40%"></div></div>
+    <div class="section-hero">
+      <div class="section-num">2</div>
+      <div class="section-meta">
+        <div class="section-tag amber">Scoperta</div>
+        <div class="section-title">Quale carta descrive questo paese?</div>
+        <div class="section-desc">Leggi la scheda del paese qui sotto, poi scegli la carta Demopoli che corrisponde meglio alla sua situazione demografica.</div>
+      </div>
+    </div>
+    <div class="intro-box amber">
+      <strong>Come funziona.</strong> Leggi i dati con attenzione. Confrontali con le quattro carte qui sotto. Quando hai scelto, clicca <em>Conferma</em> per scoprire se hai indovinato e capire il collegamento.
+    </div>
+    <div id="paeseCard"></div>
+    <div style="margin-bottom:8px;"><span class="field-label">Quale carta corrisponde a questo paese?</span></div>
+    <div class="obiettivi-scelta" id="obiettivi-scelta"></div>
+    <div class="error-msg" id="errEuristica" style="margin-bottom:12px;">Seleziona una carta prima di confermare</div>
+    <div class="conferma-btn-wrap">
+      <button class="btn primary" id="confermaBtn" onclick="confermaScelta()">Conferma scelta →</button>
+    </div>
+    <div class="reveal-box" id="revealBox"></div>
+    <div class="nav-row">
+      <button class="btn ghost" onclick="goBack(2)">← Indietro</button>
+      <button class="btn primary" id="btnDopoReveal" style="display:none" onclick="goNext(2)">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="progress-wrap"><div class="progress-fill" style="width:60%"></div></div>
+    <div class="section-hero">
+      <div class="section-num">3</div>
+      <div class="section-meta">
+        <div class="section-tag">Le tue carte</div>
+        <div class="section-title">Dal gioco alla realtà</div>
+        <div class="section-desc">Ecco la tua carta Obiettivo e la tua carta Politica. Rileggile, poi rispondi.</div>
+      </div>
+    </div>
+    <div class="cards-row" id="cardsRow"></div>
+
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">4</div><div class="q-label">Hai appena visto che la tua carta Obiettivo corrisponde a una situazione reale. Descrivi con parole tue: in cosa si assomigliavano la tua città nel gioco e il paese reale che hai scoperto?</div></div>
+      <div class="q-hint">Pensa alla composizione della popolazione, ai problemi, alle sfide che avevi durante la partita.</div>
+      <textarea id="r4" rows="4" placeholder="Scrivi qui la tua risposta…"></textarea>
+      <div class="error-msg" id="err4">Scrivi almeno qualcosa</div>
+      <div class="ai-feedback-area">
+        <button class="ai-btn" id="aibtn4" onclick="requestFeedback(4)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Chiedi feedback
+        </button>
+        <div class="ai-thinking" id="aithink4"><span>✦</span><span>Sto leggendo la tua risposta<span class="dots-anim"><span>.</span><span>.</span><span>.</span></span></span></div>
+        <div class="ai-feedback-box" id="aifeedback4">
+          <div class="ai-feedback-header"><span class="ai-feedback-header-icon">✦</span><span class="ai-feedback-header-text">Feedback</span></div>
+          <div class="ai-feedback-body" id="aifeedback4-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">5</div><div class="q-label">Guarda la tua carta Politica: nella realtà uno Stato potrebbe usare una misura simile? Spiega come funzionerebbe davvero e se secondo te sarebbe efficace.</div></div>
+      <div class="q-hint">Non serve che sia esattamente uguale — puoi adattarla o proporne una variante.</div>
+      <textarea id="r5" rows="4" placeholder="Scrivi qui la tua risposta…"></textarea>
+      <div class="error-msg" id="err5">Scrivi almeno qualcosa</div>
+      <div class="ai-feedback-area">
+        <button class="ai-btn" id="aibtn5" onclick="requestFeedback(5)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Chiedi feedback
+        </button>
+        <div class="ai-thinking" id="aithink5"><span>✦</span><span>Sto leggendo la tua risposta<span class="dots-anim"><span>.</span><span>.</span><span>.</span></span></span></div>
+        <div class="ai-feedback-box" id="aifeedback5">
+          <div class="ai-feedback-header"><span class="ai-feedback-header-icon">✦</span><span class="ai-feedback-header-text">Feedback</span></div>
+          <div class="ai-feedback-body" id="aifeedback5-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" onclick="goBack(3)">← Indietro</button>
+      <button class="btn primary" onclick="goNext(3)">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <div class="progress-wrap"><div class="progress-fill" style="width:80%"></div></div>
+    <div class="section-hero">
+      <div class="section-num">4</div>
+      <div class="section-meta">
+        <div class="section-tag red">Risposta aperta</div>
+        <div class="section-title">Ragionamento</div>
+        <div class="section-desc">La domanda più importante. Non c'è una risposta unica — conta il ragionamento.</div>
+      </div>
+    </div>
+    <div class="q-card">
+      <div class="q-num-row"><div class="q-badge">6</div><div class="q-label">L'Italia ha oggi uno dei tassi di natalità più bassi al mondo e una popolazione sempre più anziana. Usando quello che hai imparato nel gioco e nella sezione precedente, spiega: quali conseguenze ha questa situazione sull'economia e sui servizi pubblici? Cosa potrebbe fare lo Stato?</div></div>
+      <div class="q-hint">Puoi usare: saldo naturale, saldo migratorio, piramide della popolazione, spesa pubblica. Non è necessario usarli tutti.</div>
+      <textarea id="r6" rows="8" placeholder="Scrivi qui il tuo ragionamento…"></textarea>
+      <div class="error-msg" id="err6">Scrivi almeno qualcosa</div>
+      <div class="ai-feedback-area">
+        <button class="ai-btn" id="aibtn6" onclick="requestFeedback(6)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Chiedi feedback
+        </button>
+        <div class="ai-thinking" id="aithink6"><span>✦</span><span>Sto leggendo la tua risposta<span class="dots-anim"><span>.</span><span>.</span><span>.</span></span></span></div>
+        <div class="ai-feedback-box" id="aifeedback6">
+          <div class="ai-feedback-header"><span class="ai-feedback-header-icon">✦</span><span class="ai-feedback-header-text">Feedback</span></div>
+          <div class="ai-feedback-body" id="aifeedback6-body"></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" onclick="goBack(4)">← Indietro</button>
+      <button class="btn primary" onclick="goNext(4)">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="step5">
+    <div class="progress-wrap"><div class="progress-fill" style="width:95%"></div></div>
+    <div class="section-hero">
+      <div class="section-num">5</div>
+      <div class="section-meta">
+        <div class="section-tag">2 minuti</div>
+        <div class="section-title">Valutazione personale</div>
+        <div class="section-desc">Ultime quattro domande, poi puoi inviare.</div>
+      </div>
+    </div>
+    <div class="val-grid">
+      <div class="val-cell"><span class="val-cell-label">Una cosa che ho capito sulla demografia</span><textarea id="v1" rows="3" placeholder="Scrivi qui…"></textarea></div>
+      <div class="val-cell"><span class="val-cell-label">Una cosa che voglio approfondire</span><textarea id="v2" rows="3" placeholder="Scrivi qui…"></textarea></div>
+      <div class="val-cell"><span class="val-cell-label">Quello che non mi aspettavo</span><textarea id="v3" rows="3" placeholder="Scrivi qui…"></textarea></div>
+      <div class="val-cell"><span class="val-cell-label">Cosa cambierei nel gioco</span><textarea id="v4" rows="3" placeholder="Scrivi qui…"></textarea></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" onclick="goBack(5)">← Indietro</button>
+      <button class="btn send" onclick="submitForm()" id="sendBtn">Invia al professore ↗</button>
+    </div>
+    <div id="sendError" style="text-align:right;font-size:13px;color:var(--red);margin-top:10px;display:none;">Errore nell'invio. Riprova o chiedi al professore.</div>
+  </div>
+
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✓</div>
+  <div class="success-title">Scheda Inviata!</div>
+  <div class="success-sub">Le tue risposte sono state inviate al professore. Puoi chiudere questa finestra.</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// DATI
+// ════════════════════════════════════════════════════════════
+const OBIETTIVI = [
+  { id:1, diff:1, title:'La città accogliente', scenario:'🌍 Arrivano nuovi abitanti. La città deve farsi trovare pronta.', pop:{b:2,a:3,z:2}, hiPop:'', ob1:'Raggiungere 14 abitanti totali', ob2:'Possedere 1 Centro Culturale o 1 Parco', popDesc:'2 bambini · 3 adulti · 2 anziani' },
+  { id:2, diff:1, title:'La culla vuota', scenario:'🏫 Nascono pochissimi bambini. Le scuole rischiano di chiudere.', pop:{b:1,a:4,z:2}, hiPop:'b', ob1:'Raggiungere almeno 5 bambini', ob2:'Possedere almeno 1 scuola attiva', popDesc:'1 bambino · 4 adulti · 2 anziani' },
+  { id:3, diff:1, title:'La città dei nonni', scenario:'👴 Troppi anziani, pochi lavoratori. Chi si prende cura di loro?', pop:{b:2,a:2,z:3}, hiPop:'z', ob1:'Raggiungere almeno 4 adulti', ob2:'Possedere 1 ospedale o 1 Centro Anziani', popDesc:'2 bambini · 2 adulti · 3 anziani' },
+  { id:5, diff:1, title:'La città malata', scenario:'🌡️ La mortalità è alta. L\'ospedale non basta.', pop:{b:2,a:3,z:2}, hiPop:'', ob1:'Possedere almeno 1 ospedale attivo', ob2:'Raggiungere 12 abitanti totali', popDesc:'2 bambini · 3 adulti · 2 anziani' },
+  { id:7, diff:2, title:'La fuga dei giovani', scenario:'🏭 I giovani se ne vanno. Il centro è pieno di negozi chiusi.', pop:{b:2,a:1,z:4}, hiPop:'z', ob1:'Raggiungere almeno 6 adulti', ob2:'Possedere 1 Centro Culturale o 1 Sportello Lavoro', popDesc:'2 bambini · 1 adulto · 4 anziani' },
+  { id:9, diff:2, title:'La città dormitorio', scenario:'🌙 Tutti lavorano fuori. La città si svuota ogni anno.', pop:{b:1,a:5,z:1}, hiPop:'a', ob1:'Avere almeno 3 bambini E 3 anziani', ob2:'Possedere 1 proprietà per bambini E 1 per anziani', popDesc:'1 bambino · 5 adulti · 1 anziano' },
+  { id:10, diff:2, title:'La città universitaria', scenario:'🎓 Piena di giovani adulti, ma senza radici.', pop:{b:1,a:5,z:1}, hiPop:'a', ob1:'Raggiungere almeno 3 bambini', ob2:'Raggiungere 15 abitanti totali', popDesc:'1 bambino · 5 adulti · 1 anziano' },
+  { id:11, diff:2, title:'Il baby boom', scenario:'🍼 Tanti bambini, pochi adulti. Servono più strutture.', pop:{b:5,a:1,z:1}, hiPop:'b', ob1:'Possedere entrambe le scuole (Est + Ovest)', ob2:'Raggiungere almeno 4 adulti', popDesc:'5 bambini · 1 adulto · 1 anziano' },
+];
+
+const CASI_REALI = {
+  1:{icon:'✈️',titolo:'Quando le frontiere si aprono',sottotitolo:'Europa centro-settentrionale, anni 2015–2022',dati:[{label:'Immigrati accolti',val:'2 milioni+',sub:'in 7 anni'},{label:'Crescita popolazione',val:'+2,4%',sub:'tra 2015 e 2022'},{label:'Età media',val:'44 anni',sub:'relativamente giovane per l\'Europa'},{label:'Servizi sociali',val:'in espansione',sub:'investimenti record'}],desc:'Questo grande paese europeo ha aperto le porte a milioni di persone in fuga da guerre e povertà. <strong>La popolazione è cresciuta rapidamente</strong>, ma integrare così tante persone ha richiesto enormi investimenti in scuole, case, corsi di lingua e strutture culturali. Le città con più servizi hanno attratto più nuovi arrivati — esattamente come succede nel gioco.',paese:'Germania',spiegazione:'La carta <strong>La città accogliente</strong> riflette proprio la sfida tedesca: una popolazione che cresce grazie all\'immigrazione ha bisogno di <strong>servizi culturali e spazi comuni</strong> per funzionare. Nel gioco devi costruire un Centro Culturale o un Parco — nella realtà la Germania ha investito miliardi in centri di integrazione e spazi pubblici.'},
+  2:{icon:'👶',titolo:'Il silenzio dei passeggini',sottotitolo:'Europa meridionale, oggi',dati:[{label:'Nati nel 2023',val:'379.000',sub:'minimo storico dall\'Unità'},{label:'Tasso di fecondità',val:'1,20',sub:'figli per donna (media UE: 1,46)'},{label:'Scuole primarie chiuse',val:'+1.000',sub:'negli ultimi 10 anni'},{label:'Età media',val:'46 anni',sub:'tra le più alte al mondo'}],desc:'In questo paese del Mediterraneo <strong>nascono sempre meno bambini</strong>. Nel 2023 i nati sono stati meno che in qualsiasi altro anno dalla nascita dello Stato unitario. Le scuole primarie, soprattutto al Sud, chiudono per mancanza di iscritti. Le famiglie giovani si spostano nelle grandi città o all\'estero. Il paese ha più pensionati che bambini.',paese:'Italia',spiegazione:'La carta <strong>La culla vuota</strong> descrive esattamente la situazione italiana: pochissimi bambini, scuole vuote, urgenza di invertire il trend. Nel gioco devi raggiungere 5 bambini e costruire una scuola — nella realtà l\'Italia sta cercando di farlo con l\'Assegno Unico per i figli, ma i risultati sulle nascite sono ancora deludenti.'},
+  3:{icon:'🎌',titolo:'L\'isola dove il tempo rallenta',sottotitolo:'Asia orientale, arcipelago del Pacifico',dati:[{label:'Over 65',val:'29%',sub:'della popolazione totale'},{label:'Nati nel 2023',val:'758.000',sub:'su 125 milioni di abitanti'},{label:'Villaggi abbandonati',val:'800+',sub:'zero nascite negli ultimi anni'},{label:'Lavoratori sanitari',val:'settore n°1',sub:'in crescita più rapida'}],desc:'In questo paese insulare dell\'Asia orientale quasi <strong>un abitante su tre ha più di 65 anni</strong>. I giovani si concentrano nelle metropoli, lasciando i villaggi rurali agli anziani. L\'economia fatica a sostenere il costo delle pensioni e della sanità con sempre meno lavoratori attivi. Il governo ha lanciato robot assistenti per anziani perché non ci sono abbastanza operatori umani.',paese:'Giappone',spiegazione:'La carta <strong>La città dei nonni</strong> rispecchia la crisi giapponese: troppi anziani, pochi adulti lavorativi. Nel gioco devi raggiungere 4 adulti e costruire strutture per anziani — in Giappone il governo investe miliardi in case di riposo e assistenza domiciliare, e ha iniziato ad aprire l\'immigrazione per la prima volta nella sua storia.'},
+  5:{icon:'🏥',titolo:'Nascere è ancora una scommessa',sottotitolo:'Africa occidentale',dati:[{label:'Mortalità infantile',val:'78‰',sub:'nati vivi (Italia: 2,5‰)'},{label:'Medici per abitante',val:'0,02',sub:'ogni 1.000 persone'},{label:'Aspettativa di vita',val:'54 anni',sub:'tra le più basse al mondo'},{label:'Ospedali nelle capitali',val:'>70%',sub:'delle strutture sanitarie'}],desc:'In questo piccolo paese dell\'Africa occidentale <strong>la mortalità è ancora altissima</strong>, soprattutto per i bambini e le madri durante il parto. Gli ospedali esistono, ma sono quasi tutti concentrati nella capitale: chi vive nelle zone rurali percorre ore per raggiungere un medico. La popolazione cresce, ma tante persone muoiono prima di invecchiare.',paese:'Sierra Leone',spiegazione:'La carta <strong>La città malata</strong> descrive una città dove costruire un ospedale non basta — bisogna anche far crescere la popolazione nonostante l\'alta mortalità. In Sierra Leone il problema non è avere ospedali sulla carta, ma renderli accessibili a tutti. Nel gioco devi raggiungere 12 abitanti nonostante gli eventi −MORTO: la stessa sfida di un paese con poca sanità territoriale.'},
+  7:{icon:'🧳',titolo:'Le valigie che non tornano',sottotitolo:'Italia meridionale',dati:[{label:'Giovani emigrati',val:'2,5 mln',sub:'dal Sud negli ultimi 20 anni'},{label:'Calo popolazione under 40',val:'−1% l\'anno',sub:'in alcune regioni'},{label:'Età media nei borghi',val:'55+ anni',sub:'in molti comuni interni'},{label:'Negozi chiusi nei centri',val:'>40%',sub:'in comuni sotto 5.000 ab.'}],desc:'Nelle regioni del Sud Italia i giovani partono: verso il Nord, verso l\'estero, verso le grandi città. Rimangono gli anziani, i negozi che chiudono, le scuole che accorpano le classi. <strong>Alcune zone perdono l\'1% della popolazione ogni anno</strong>, un ritmo che in 50 anni significa dimezzarsi. I comuni cercano disperatamente di attrarre nuovi abitanti con case a 1 euro o incentivi fiscali.',paese:'Mezzogiorno d\'Italia (Calabria, Basilicata, Molise)',spiegazione:'La carta <strong>La fuga dei giovani</strong> con 1 solo adulto su 7 abitanti è il ritratto di un borgo del Sud: pochi lavoratori, molti anziani, strutture che si svuotano. Nel gioco devi attrarre adulti e costruire uno Sportello Lavoro o un Centro Culturale — esattamente quello che i comuni del Mezzogiorno tentano di fare per fermare la fuga.'},
+  9:{icon:'🚃',titolo:'Sveglia, lavoro, silenzio',sottotitolo:'Hinterland delle grandi metropoli italiane',dati:[{label:'Pendolari giornalieri',val:'+60%',sub:'della forza lavoro esce dal comune'},{label:'Servizi culturali locali',val:'scarsi',sub:'rispetto alle città centro'},{label:'Famiglie con figli',val:'in calo',sub:'preferiscono i centri urbani'},{label:'Anziani soli',val:'in crescita',sub:'senza rete familiare vicina'}],desc:'Questi comuni esistono soprattutto come luoghi dove <strong>dormire tra un giorno di lavoro e l\'altro</strong>. Quasi tutti gli adulti lavorano altrove — a Milano, Roma, Bologna. Le strade sono trafficate di mattina e di sera, silenziose di giorno. Mancano asili, mancano luoghi di aggregazione per i giovani, mancano strutture per gli anziani. La vita comunitaria è quasi assente.',paese:'Comuni dormitorio (es. Sesto San Giovanni, Cinisello Balsamo)',spiegazione:'La carta <strong>La città dormitorio</strong> parte con 5 adulti ma quasi nessun bambino né anziano: tanti lavoratori, nessuna vera comunità. Nel gioco devi riequilibrare le fasce d\'età e costruire servizi per bambini e anziani — nella realtà questi comuni cercano di diventare "città vere" investendo in scuole, parchi e centri per anziani.'},
+  10:{icon:'🎓',titolo:'Piena di vita, vuota di futuro',sottotitolo:'Città universitarie italiane e europee',dati:[{label:'Studenti su abitanti',val:'25%',sub:'in alcune città universitarie'},{label:'Famiglie con bambini',val:'poche',sub:'gli studenti non mettono radici'},{label:'Laureati che restano',val:'<30%',sub:'la maggioranza se ne va'},{label:'Età media',val:'bassa',sub:'ma solo durante l\'anno accademico'}],desc:'Queste città sembrano giovani e vivaci, piene di studenti e bar aperti fino a tardi. Ma <strong>quasi nessuno mette radici</strong>: dopo la laurea si parte, si cerca lavoro altrove, si torna nel proprio paese. D\'estate la città si svuota. Le famiglie con bambini sono pochissime. Gli anziani rimangono, ma isolati. La vivacità è temporanea.',paese:'Bologna, Pavia, Trento — e molte città universitarie europee',spiegazione:'La carta <strong>La città universitaria</strong> parte con 5 adulti giovani ma quasi senza bambini né anziani: una comunità incompleta. Nel gioco devi raggiungere 3 bambini e 15 abitanti totali — cioè trasformare una città di passaggio in una città dove le persone decidono di restare e costruire famiglie.'},
+  11:{icon:'🍼',titolo:'Troppe culle, poche braccia',sottotitolo:'Francia, dopoguerra — e paesi in via di sviluppo oggi',dati:[{label:'Nati in Francia 1946',val:'840.000',sub:'contro 550.000 nel 2023'},{label:'Adulti disponibili',val:'pochissimi',sub:'molti erano morti in guerra'},{label:'Scuole costruite 1950–60',val:'migliaia',sub:'emergenza educativa nazionale'},{label:'Oggi: paesi alto tasso',val:'5+ figli',sub:'per donna in Niger, Mali'}],desc:'Dopo la Seconda guerra mondiale la Francia visse un <strong>baby boom straordinario</strong>: milioni di bambini in pochi anni, con pochissimi adulti disponibili perché tanti erano morti in guerra o emigrati. Scuole, ospedali e strutture per bambini non bastavano. Oggi lo stesso fenomeno si vive in molti paesi dell\'Africa subsahariana: tanti bambini, pochi adulti, infrastrutture insufficienti.',paese:'Francia 1945–1970 / Niger, Mali oggi',spiegazione:'La carta <strong>Il baby boom</strong> parte con 5 bambini e 1 solo adulto: una situazione che sembra positiva ma è fragile. Nel gioco devi costruire entrambe le scuole e portare adulti — nella realtà un paese con molti bambini e pochi adulti rischia di non riuscire a educarli e mantenerli tutti, a meno che non costruisca infrastrutture molto rapidamente.'},
+};
+
+const POLITICHE = [
+  {title:'Bonus Bebè',icon:'👶',costo:60,effetto:'Aggiungi subito 2 bambini alla tua città',nota:'Effetto immediato. Poi scarta.',problema:'Bassa natalità'},
+  {title:'Campagna Immigrazione',icon:'✈️',costo:80,effetto:'Aggiungi subito 2 adulti alla tua città',nota:'Effetto immediato. Poi scarta.',problema:'Carenza di lavoratori'},
+  {title:'Piano Sanitario Straordinario',icon:'🏥',costo:100,effetto:'Questo turno: ignora un evento −MORTO',nota:'Usala appena atterri su −MORTO. Poi scarta.',problema:'Alta mortalità'},
+  {title:'Incentivi alla Famiglia',icon:'👨‍👩‍👧',costo:60,effetto:'Aggiungi subito 2 bambini alla tua città',nota:'Effetto immediato. Poi scarta.',problema:'Bassa natalità'},
+  {title:'Piano Casa',icon:'🏠',costo:80,effetto:'Aggiungi subito 1 bambino, 1 adulto e 1 anziano',nota:'Effetto immediato. Poi scarta.',problema:'Città sbilanciata'},
+  {title:'Riqualificazione Urbana',icon:'🏗️',costo:120,effetto:"Aggiungi subito +1 a ogni fascia d'età",nota:'Bambini +1 · Adulti +1 · Anziani +1. Poi scarta.',problema:'Squilibrio demografico'},
+  {title:'Sussidio Anziani',icon:'🧓',costo:60,effetto:'Questo turno: ignora un evento −MORTO',nota:'Usala appena atterri su −MORTO. Poi scarta.',problema:'Troppe morti'},
+  {title:'Piano Lavoro',icon:'💼',costo:80,effetto:'Aggiungi subito 1 adulto e incassa 50 soldi',nota:'Effetto immediato. Poi scarta.',problema:'Fuga di adulti'},
+  {title:'Campagna di Accoglienza',icon:'🤝',costo:60,effetto:'Aggiungi subito 2 adulti alla tua città',nota:'Effetto immediato. Poi scarta.',problema:'Pochi adulti'},
+  {title:'Festival della Città',icon:'🎉',costo:60,effetto:'Aggiungi subito 1 bambino e 1 adulto',nota:'Effetto immediato. Poi scarta.',problema:'Crescita lenta'},
+  {title:'Emergenza Demografica',icon:'🚨',costo:100,effetto:'Ignora fino a 2 eventi negativi questo turno',nota:'Usala al primo evento negativo. Poi scarta.',problema:'Crisi grave'},
+];
+
+// ════════════════════════════════════════════════════════════
+// STATO
+// ════════════════════════════════════════════════════════════
+let answers = {r1:'',r2:'',r3:''};
+let assignedObiettivo = null;
+let assignedPolitica  = null;
+let euristicaScelta   = null;
+let euristicaConfermata = false;
+const TOTAL_STEPS = 6;
+
+// ════════════════════════════════════════════════════════════
+// DOTS
+// ════════════════════════════════════════════════════════════
+function renderDots(){
+  const w=document.getElementById('stepDots'); w.innerHTML='';
+  for(let i=0;i<TOTAL_STEPS;i++){
+    const d=document.createElement('div');
+    d.className='step-dot'+(i===0?' active':'');
+    d.id='dot'+i; w.appendChild(d);
+  }
+}
+function updateDots(cur){
+  for(let i=0;i<TOTAL_STEPS;i++){
+    const d=document.getElementById('dot'+i); if(!d)return;
+    d.className='step-dot';
+    if(i<cur) d.classList.add('done');
+    else if(i===cur) d.classList.add('active');
+  }
+}
+renderDots();
+
+// ════════════════════════════════════════════════════════════
+// CARTE RANDOM
+// ════════════════════════════════════════════════════════════
+function assignCards(){
+  if(assignedObiettivo) return;
+  assignedObiettivo = OBIETTIVI[Math.floor(Math.random()*OBIETTIVI.length)];
+  assignedPolitica  = POLITICHE[Math.floor(Math.random()*POLITICHE.length)];
+}
+
+function buildObiettivoPill(o){
+  const pips=[1,2].map(i=>`<div class="pip${i<=o.diff?' on':''}"></div>`).join('');
+  return `
+    <div class="game-card">
+      <div class="game-card-header">
+        <span class="game-card-type">Carta Obiettivo ${o.id}/16</span>
+        <span class="game-card-title">${o.title}</span>
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-scenario">${o.scenario}</div>
+        <div class="pop-grid">
+          <div class="pop-cell${o.hiPop==='b'?' hi':''}"><span class="pop-ico">👶</span><span class="pop-lbl">Bambini</span><span class="pop-val">${o.pop.b}</span></div>
+          <div class="pop-cell${o.hiPop==='a'?' hi':''}"><span class="pop-ico">🧑</span><span class="pop-lbl">Adulti</span><span class="pop-val">${o.pop.a}</span></div>
+          <div class="pop-cell${o.hiPop==='z'?' hi':''}"><span class="pop-ico">👴</span><span class="pop-lbl">Anziani</span><span class="pop-val">${o.pop.z}</span></div>
+        </div>
+        <div class="ob-label">Per vincere</div>
+        <div class="ob-item"><span class="ob-n">1</span><span>${o.ob1}</span></div>
+        <div class="ob-item"><span class="ob-n">2</span><span>${o.ob2}</span></div>
+      </div>
+      <div class="game-card-footer"><span class="diff-label">Difficoltà</span><div class="diff-pips">${pips}</div></div>
+    </div>`;
+}
+
+function renderCardsStep3(){
+  const o=assignedObiettivo, p=assignedPolitica;
+  const polCard=`
+    <div class="game-card">
+      <div class="game-card-header pol-card-header">
+        <span class="game-card-type">Carta Politica</span>
+        <span class="game-card-title">${p.icon} ${p.title}</span>
+      </div>
+      <div class="pol-cost"><span class="pol-cost-label">Costo</span><span class="pol-cost-val">⊕ ${p.costo}</span></div>
+      <div class="game-card-body">
+        <div class="ob-label">Effetto</div>
+        <div class="pol-effect">${p.effetto}</div>
+        <div class="pol-note">${p.nota}</div>
+      </div>
+      <div class="game-card-footer"><span class="pol-problem">Problema: ${p.problema}</span></div>
+    </div>`;
+  document.getElementById('cardsRow').innerHTML = buildObiettivoPill(o) + polCard;
+}
+
+// ════════════════════════════════════════════════════════════
+// EURISTICA
+// ════════════════════════════════════════════════════════════
+function buildEuristica(){
+  const o=assignedObiettivo, cr=CASI_REALI[o.id];
+  const datiHtml=cr.dati.map(d=>`
+    <div class="dato">
+      <span class="dato-label">${d.label}</span>
+      <span class="dato-val">${d.val}</span>
+      <span class="dato-sub">${d.sub}</span>
+    </div>`).join('');
+  document.getElementById('paeseCard').innerHTML=`
+    <div class="paese-card">
+      <div class="paese-card-header">
+        <span class="paese-card-icon">${cr.icon}</span>
+        <div>
+          <div class="paese-card-titolo">${cr.titolo}</div>
+          <div class="paese-card-sottotitolo">${cr.sottotitolo}</div>
+        </div>
+      </div>
+      <div class="paese-card-body">
+        <div class="dati-grid">${datiHtml}</div>
+        <div class="paese-desc">${cr.desc}</div>
+      </div>
+    </div>`;
+  const pool=OBIETTIVI.filter(x=>x.id!==o.id);
+  const shuffled=pool.sort(()=>Math.random()-0.5).slice(0,3);
+  const scelte=[o,...shuffled].sort(()=>Math.random()-0.5);
+  document.getElementById('obiettivi-scelta').innerHTML=scelte.map(c=>`
+    <div class="ob-choice" id="obchoice-${c.id}" onclick="selectObChoice(${c.id})">
+      <span class="ob-choice-num">Obiettivo ${c.id}</span>
+      <div class="ob-choice-title">${c.title}</div>
+      <div class="ob-choice-pop">${c.popDesc}</div>
+    </div>`).join('');
+}
+
+function selectObChoice(id){
+  if(euristicaConfermata) return;
+  euristicaScelta=id;
+  document.querySelectorAll('.ob-choice').forEach(el=>{
+    el.classList.remove('selected');
+    if(el.id===`obchoice-${id}`) el.classList.add('selected');
+  });
+  document.getElementById('errEuristica').style.display='none';
+}
+
+function confermaScelta(){
+  if(euristicaConfermata) return;
+  if(!euristicaScelta){document.getElementById('errEuristica').style.display='block';return;}
+  euristicaConfermata=true;
+  const o=assignedObiettivo, cr=CASI_REALI[o.id];
+  const correct=(euristicaScelta===o.id);
+  document.querySelectorAll('.ob-choice').forEach(el=>{
+    const eid=parseInt(el.id.replace('obchoice-',''));
+    el.classList.remove('selected');
+    if(eid===o.id) el.classList.add('correct');
+    else if(eid===euristicaScelta&&!correct) el.classList.add('wrong');
+  });
+  const wrongNote=!correct?`<div class="reveal-wrong-note">Hai scelto un'altra carta — ma nessun problema! Leggi la spiegazione qui sotto per capire il collegamento corretto.</div>`:'';
+  document.getElementById('revealBox').innerHTML=`
+    <div class="reveal-header">
+      <span class="reveal-icon">${correct?'🎯':'💡'}</span>
+      <div>
+        <div class="reveal-titolo">${correct?'Esatto!':'La risposta corretta'}</div>
+        <div class="reveal-paese">Il paese era: ${cr.paese}</div>
+      </div>
+    </div>
+    <div class="reveal-body">${wrongNote}<div class="reveal-spiegazione">${cr.spiegazione}</div></div>`;
+  document.getElementById('revealBox').classList.add('visible');
+  document.getElementById('confermaBtn').style.display='none';
+  document.getElementById('btnDopoReveal').style.display='block';
+  document.getElementById('revealBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ════════════════════════════════════════════════════════════
+// AI FEEDBACK
+// ════════════════════════════════════════════════════════════
+async function requestFeedback(qNum) {
+  const risposta = document.getElementById('r'+qNum).value.trim();
+  if (!risposta) {
+    alert('Scrivi prima la tua risposta, poi chiedi il feedback.');
+    return;
+  }
+
+  const btn = document.getElementById('aibtn'+qNum);
+  const thinking = document.getElementById('aithink'+qNum);
+  const feedbackBox = document.getElementById('aifeedback'+qNum);
+  const feedbackBody = document.getElementById('aifeedback'+qNum+'-body');
+
+  btn.disabled = true;
+  feedbackBox.classList.remove('visible');
+  thinking.classList.add('visible');
+
+  const o = assignedObiettivo;
+  const p = assignedPolitica;
+  const cr = CASI_REALI[o.id];
+
+  // Costruisci il prompt contestuale per ogni domanda
+  let prompt = '';
+
+  if (qNum === 4) {
+    prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
+
+Lo studente aveva la carta obiettivo "${o.title}" (popolazione iniziale: ${o.pop.b} bambini, ${o.pop.a} adulti, ${o.pop.z} anziani; scenario: "${o.scenario.replace(/[^\w\s'àèéìòù.,!?–—]/g, '')}").
+Il paese reale corrispondente era: ${cr.paese} (${cr.titolo}).
+
+Domanda posta allo studente: "In cosa si assomigliavano la tua città nel gioco e il paese reale che hai scoperto? Pensa alla composizione della popolazione, ai problemi, alle sfide."
+
+Risposta dello studente: "${risposta}"
+
+Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Regole:
+- Se la risposta coglie il collegamento essenziale, dillo chiaramente e valorizzalo.
+- Se manca un collegamento logico importante (es. lo studente descrive solo il gioco senza parlare del paese reale, o viceversa), fai notare cosa manca con una domanda o osservazione, senza giudicare.
+- Non esigere perfezione formale o sintattica.
+- Se la risposta è vaga ma non sbagliata, puoi suggerire un dettaglio da aggiungere.
+- Parla direttamente allo studente, in italiano, con tono amichevole e diretto.
+- Non inventare informazioni sul paese o sul gioco che non ti sono state fornite.
+- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+  }
+
+  if (qNum === 5) {
+    prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
+
+Lo studente aveva la carta politica "${p.title}" (effetto nel gioco: "${p.effetto}"; problema che risolve: "${p.problema}").
+Il paese reale associato alla sua carta obiettivo era: ${cr.paese}.
+
+Domanda posta allo studente: "Nella realtà uno Stato potrebbe usare una misura simile a questa carta? Spiega come funzionerebbe davvero e se secondo te sarebbe efficace."
+
+Risposta dello studente: "${risposta}"
+
+Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Regole:
+- Se lo studente descrive una misura reale coerente con la carta (anche adattata), valorizzalo.
+- Se la risposta rimane troppo astratta o ripete solo quello che c'è scritto sulla carta senza trasporla nella realtà, invita lo studente a fare un esempio concreto.
+- Se c'è un errore logico evidente (es. confonde cause ed effetti, o propone misure che contraddicono l'obiettivo), fallo notare con una domanda.
+- Non esigere perfezione formale.
+- Parla direttamente allo studente, in italiano, tono amichevole.
+- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+  }
+
+  if (qNum === 6) {
+    prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
+
+Domanda posta allo studente: "L'Italia ha oggi uno dei tassi di natalità più bassi al mondo e una popolazione sempre più anziana. Usando quello che hai imparato nel gioco, spiega: quali conseguenze ha questa situazione sull'economia e sui servizi pubblici? Cosa potrebbe fare lo Stato?"
+
+Risposta dello studente: "${risposta}"
+
+Dai un feedback breve (3-6 frasi) adatto a un tredicenne. Regole:
+- Questa è la domanda di ragionamento più importante: non c'è una risposta unica.
+- Se lo studente fa un ragionamento coerente — anche parziale — valorizzalo esplicitamente.
+- Se manca un passaggio logico importante (es. dice "ci sono pochi giovani" ma non collega alle conseguenze economiche, o propone soluzioni senza spiegarne il meccanismo), fai notare cosa manca con una domanda aperta.
+- Se usa termini come saldo naturale, piramide della popolazione, spesa pubblica in modo corretto, riconoscilo.
+- Se li usa in modo impreciso o sbagliato, correggilo gentilmente.
+- Non esigere un saggio: apprezza il ragionamento anche se espresso semplicemente.
+- Parla direttamente allo studente, in italiano, tono amichevole e diretto.
+- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+  }
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || 'Non sono riuscito a generare un feedback. Riprova.';
+
+    thinking.classList.remove('visible');
+    feedbackBody.innerHTML = text.replace(/\n/g, '<br>');
+    feedbackBox.classList.add('visible');
+
+    // Aggiorna il testo del pulsante
+    btn.textContent = '↺ Nuovo feedback';
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Nuovo feedback`;
+    btn.disabled = false;
+
+    feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  } catch (e) {
+    thinking.classList.remove('visible');
+    feedbackBody.innerHTML = 'Errore di connessione. Controlla la rete e riprova.';
+    feedbackBox.classList.add('visible');
+    btn.disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGAZIONE
+// ════════════════════════════════════════════════════════════
+let currentStep = 0;
+function goNext(from){
+  if(!validateStep(from)) return;
+  if(from===1){ assignCards(); buildEuristica(); }
+  if(from===2){ renderCardsStep3(); }
+  showStep(from+1);
+}
+function goBack(from){ showStep(from-1); }
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('visible'));
+  const t=document.getElementById('step'+n);
+  if(t){t.classList.add('visible');window.scrollTo({top:0,behavior:'smooth'});}
+  currentStep=n; updateDots(n);
+}
+
+// ════════════════════════════════════════════════════════════
+// OPZIONI
+// ════════════════════════════════════════════════════════════
+function selectOpt(label,name,val){
+  document.querySelectorAll(`[name="${name}"]`).forEach(r=>r.closest('.option-label').classList.remove('selected'));
+  label.classList.add('selected'); answers[name]=val;
+  const num=name.replace('r','');
+  const err=document.getElementById('err'+num);
+  if(err) err.style.display='none';
+}
+
+// ════════════════════════════════════════════════════════════
+// VALIDAZIONE
+// ════════════════════════════════════════════════════════════
+function validateStep(step){
+  if(step===0){
+    let ok=true;
+    ['nome','classe'].forEach((id,i)=>{
+      const el=document.getElementById(id);
+      const fw=document.getElementById(i===0?'f-nome':'f-classe');
+      fw.classList.remove('field-error');
+      if(!el.value.trim()){fw.classList.add('field-error');ok=false;}
+    });
+    return ok;
+  }
+  if(step===1){
+    let ok=true;
+    ['1','2','3'].forEach(n=>{
+      const err=document.getElementById('err'+n);
+      if(!answers['r'+n]){err.style.display='block';ok=false;}
+      else err.style.display='none';
+    });
+    return ok;
+  }
+  if(step===2){
+    if(!euristicaConfermata){
+      document.getElementById('errEuristica').textContent='Conferma prima la tua scelta prima di andare avanti';
+      document.getElementById('errEuristica').style.display='block';
+      return false;
+    }
+    return true;
+  }
+  if(step===3){
+    let ok=true;
+    ['4','5'].forEach(n=>{
+      const val=document.getElementById('r'+n).value.trim();
+      const err=document.getElementById('err'+n);
+      if(!val){err.style.display='block';ok=false;}
+      else err.style.display='none';
+    });
+    return ok;
+  }
+  if(step===4){
+    const val=document.getElementById('r6').value.trim();
+    const err=document.getElementById('err6');
+    if(!val){err.style.display='block';return false;}
+    err.style.display='none';
+  }
+  return true;
+}
+
+// ════════════════════════════════════════════════════════════
+// INVIO
+// ════════════════════════════════════════════════════════════
+const optLabels={
+  r1:{a:'Saldo migratorio',b:'Saldo naturale',c:'Tasso di natalità',d:'Indice di dipendenza'},
+  r2:{a:'Grafico a torta',b:'Istogramma semplice',c:'Piramide della popolazione',d:'Diagramma di flusso'},
+  r3:{a:'Spese per le scuole',b:'Spese per pensioni, ospedali e assistenza',c:'Spese per strade',d:'Spese per le imprese'}
+};
+
+async function submitForm(){
+  const btn=document.getElementById('sendBtn');
+  btn.disabled=true; btn.textContent='Invio in corso…';
+  document.getElementById('sendError').style.display='none';
+
+  const nome=document.getElementById('nome').value.trim();
+  const classe=document.getElementById('classe').value.trim();
+  const data=document.getElementById('data').value.trim()||new Date().toLocaleDateString('it-IT');
+  const o=assignedObiettivo, p=assignedPolitica, cr=CASI_REALI[o.id];
+  const indovinato=(euristicaScelta===o.id)?'Sì':'No';
+
+  const body={
+    _subject:`Demopoli — Scheda di ${nome} (${classe})`,
+    Studente:nome, Classe:classe, Data:data,
+    'Carta Obiettivo':`${o.id} — ${o.title} (Livello ${o.diff})`,
+    'Caso reale assegnato':cr.paese,
+    'Ha indovinato il paese':indovinato,
+    'Carta Politica':p.title,
+    'Dom.1 — Saldo nati/morti':optLabels.r1[answers.r1]||'—',
+    'Dom.2 — Strumento composizione':optLabels.r2[answers.r2]||'—',
+    'Dom.3 — Spese pop. anziana':optLabels.r3[answers.r3]||'—',
+    'Dom.4 — Somiglianze gioco/realtà':document.getElementById('r4').value.trim(),
+    'Dom.5 — Politica nella realtà':document.getElementById('r5').value.trim(),
+    'Dom.6 — Ragionamento Italia':document.getElementById('r6').value.trim(),
+    'Val. — Cosa ho capito':document.getElementById('v1').value.trim()||'—',
+    'Val. — Voglio approfondire':document.getElementById('v2').value.trim()||'—',
+    'Val. — Momento interessante':document.getElementById('v3').value.trim()||'—',
+    'Val. — Cosa cambierei':document.getElementById('v4').value.trim()||'—',
+  };
+
+  const FORMSPREE_ID='xnjrjpby';
+
+  try{
+    const res=await fetch(`https://formspree.io/f/${FORMSPREE_ID}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(res.ok){
+      document.getElementById('mainContainer').style.display='none';
+      document.getElementById('successScreen').classList.add('visible');
+    } else { throw new Error(); }
+  } catch(e){
+    btn.disabled=false; btn.textContent='Invia al professore ↗';
+    document.getElementById('sendError').style.display='block';
+  }
+}
+</script>
+</body>
+</html>
