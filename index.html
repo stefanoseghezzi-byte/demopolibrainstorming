@@ -84,7 +84,6 @@ textarea::placeholder{color:var(--light);font-style:italic;}
 .ai-feedback-header-text{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:white;}
 .ai-feedback-body{padding:14px 16px;font-size:14px;line-height:1.7;color:var(--mid);}
 .ai-feedback-body strong{color:var(--dark);}
-.ai-feedback-note{font-size:11px;color:var(--light);font-style:italic;margin-top:10px;padding-top:10px;border-top:1px dashed var(--ai-border);}
 
 .options{display:flex;flex-direction:column;gap:8px;padding-left:36px;}
 .option-label{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:14px;color:var(--mid);border-radius:1px;user-select:none;}
@@ -422,9 +421,6 @@ textarea::placeholder{color:var(--light);font-style:italic;}
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// DATI
-// ════════════════════════════════════════════════════════════
 const OBIETTIVI = [
   { id:1, diff:1, title:'La città accogliente', scenario:'🌍 Arrivano nuovi abitanti. La città deve farsi trovare pronta.', pop:{b:2,a:3,z:2}, hiPop:'', ob1:'Raggiungere 14 abitanti totali', ob2:'Possedere 1 Centro Culturale o 1 Parco', popDesc:'2 bambini · 3 adulti · 2 anziani' },
   { id:2, diff:1, title:'La culla vuota', scenario:'🏫 Nascono pochissimi bambini. Le scuole rischiano di chiudere.', pop:{b:1,a:4,z:2}, hiPop:'b', ob1:'Raggiungere almeno 5 bambini', ob2:'Possedere almeno 1 scuola attiva', popDesc:'1 bambino · 4 adulti · 2 anziani' },
@@ -461,9 +457,6 @@ const POLITICHE = [
   {title:'Emergenza Demografica',icon:'🚨',costo:100,effetto:'Ignora fino a 2 eventi negativi questo turno',nota:'Usala al primo evento negativo. Poi scarta.',problema:'Crisi grave'},
 ];
 
-// ════════════════════════════════════════════════════════════
-// STATO
-// ════════════════════════════════════════════════════════════
 let answers = {r1:'',r2:'',r3:''};
 let assignedObiettivo = null;
 let assignedPolitica  = null;
@@ -471,9 +464,6 @@ let euristicaScelta   = null;
 let euristicaConfermata = false;
 const TOTAL_STEPS = 6;
 
-// ════════════════════════════════════════════════════════════
-// DOTS
-// ════════════════════════════════════════════════════════════
 function renderDots(){
   const w=document.getElementById('stepDots'); w.innerHTML='';
   for(let i=0;i<TOTAL_STEPS;i++){
@@ -492,9 +482,6 @@ function updateDots(cur){
 }
 renderDots();
 
-// ════════════════════════════════════════════════════════════
-// CARTE RANDOM
-// ════════════════════════════════════════════════════════════
 function assignCards(){
   if(assignedObiettivo) return;
   assignedObiettivo = OBIETTIVI[Math.floor(Math.random()*OBIETTIVI.length)];
@@ -503,80 +490,23 @@ function assignCards(){
 
 function buildObiettivoPill(o){
   const pips=[1,2].map(i=>`<div class="pip${i<=o.diff?' on':''}"></div>`).join('');
-  return `
-    <div class="game-card">
-      <div class="game-card-header">
-        <span class="game-card-type">Carta Obiettivo ${o.id}/16</span>
-        <span class="game-card-title">${o.title}</span>
-      </div>
-      <div class="game-card-body">
-        <div class="game-card-scenario">${o.scenario}</div>
-        <div class="pop-grid">
-          <div class="pop-cell${o.hiPop==='b'?' hi':''}"><span class="pop-ico">👶</span><span class="pop-lbl">Bambini</span><span class="pop-val">${o.pop.b}</span></div>
-          <div class="pop-cell${o.hiPop==='a'?' hi':''}"><span class="pop-ico">🧑</span><span class="pop-lbl">Adulti</span><span class="pop-val">${o.pop.a}</span></div>
-          <div class="pop-cell${o.hiPop==='z'?' hi':''}"><span class="pop-ico">👴</span><span class="pop-lbl">Anziani</span><span class="pop-val">${o.pop.z}</span></div>
-        </div>
-        <div class="ob-label">Per vincere</div>
-        <div class="ob-item"><span class="ob-n">1</span><span>${o.ob1}</span></div>
-        <div class="ob-item"><span class="ob-n">2</span><span>${o.ob2}</span></div>
-      </div>
-      <div class="game-card-footer"><span class="diff-label">Difficoltà</span><div class="diff-pips">${pips}</div></div>
-    </div>`;
+  return `<div class="game-card"><div class="game-card-header"><span class="game-card-type">Carta Obiettivo ${o.id}/16</span><span class="game-card-title">${o.title}</span></div><div class="game-card-body"><div class="game-card-scenario">${o.scenario}</div><div class="pop-grid"><div class="pop-cell${o.hiPop==='b'?' hi':''}"><span class="pop-ico">👶</span><span class="pop-lbl">Bambini</span><span class="pop-val">${o.pop.b}</span></div><div class="pop-cell${o.hiPop==='a'?' hi':''}"><span class="pop-ico">🧑</span><span class="pop-lbl">Adulti</span><span class="pop-val">${o.pop.a}</span></div><div class="pop-cell${o.hiPop==='z'?' hi':''}"><span class="pop-ico">👴</span><span class="pop-lbl">Anziani</span><span class="pop-val">${o.pop.z}</span></div></div><div class="ob-label">Per vincere</div><div class="ob-item"><span class="ob-n">1</span><span>${o.ob1}</span></div><div class="ob-item"><span class="ob-n">2</span><span>${o.ob2}</span></div></div><div class="game-card-footer"><span class="diff-label">Difficoltà</span><div class="diff-pips">${pips}</div></div></div>`;
 }
 
 function renderCardsStep3(){
   const o=assignedObiettivo, p=assignedPolitica;
-  const polCard=`
-    <div class="game-card">
-      <div class="game-card-header pol-card-header">
-        <span class="game-card-type">Carta Politica</span>
-        <span class="game-card-title">${p.icon} ${p.title}</span>
-      </div>
-      <div class="pol-cost"><span class="pol-cost-label">Costo</span><span class="pol-cost-val">⊕ ${p.costo}</span></div>
-      <div class="game-card-body">
-        <div class="ob-label">Effetto</div>
-        <div class="pol-effect">${p.effetto}</div>
-        <div class="pol-note">${p.nota}</div>
-      </div>
-      <div class="game-card-footer"><span class="pol-problem">Problema: ${p.problema}</span></div>
-    </div>`;
+  const polCard=`<div class="game-card"><div class="game-card-header pol-card-header"><span class="game-card-type">Carta Politica</span><span class="game-card-title">${p.icon} ${p.title}</span></div><div class="pol-cost"><span class="pol-cost-label">Costo</span><span class="pol-cost-val">⊕ ${p.costo}</span></div><div class="game-card-body"><div class="ob-label">Effetto</div><div class="pol-effect">${p.effetto}</div><div class="pol-note">${p.nota}</div></div><div class="game-card-footer"><span class="pol-problem">Problema: ${p.problema}</span></div></div>`;
   document.getElementById('cardsRow').innerHTML = buildObiettivoPill(o) + polCard;
 }
 
-// ════════════════════════════════════════════════════════════
-// EURISTICA
-// ════════════════════════════════════════════════════════════
 function buildEuristica(){
   const o=assignedObiettivo, cr=CASI_REALI[o.id];
-  const datiHtml=cr.dati.map(d=>`
-    <div class="dato">
-      <span class="dato-label">${d.label}</span>
-      <span class="dato-val">${d.val}</span>
-      <span class="dato-sub">${d.sub}</span>
-    </div>`).join('');
-  document.getElementById('paeseCard').innerHTML=`
-    <div class="paese-card">
-      <div class="paese-card-header">
-        <span class="paese-card-icon">${cr.icon}</span>
-        <div>
-          <div class="paese-card-titolo">${cr.titolo}</div>
-          <div class="paese-card-sottotitolo">${cr.sottotitolo}</div>
-        </div>
-      </div>
-      <div class="paese-card-body">
-        <div class="dati-grid">${datiHtml}</div>
-        <div class="paese-desc">${cr.desc}</div>
-      </div>
-    </div>`;
+  const datiHtml=cr.dati.map(d=>`<div class="dato"><span class="dato-label">${d.label}</span><span class="dato-val">${d.val}</span><span class="dato-sub">${d.sub}</span></div>`).join('');
+  document.getElementById('paeseCard').innerHTML=`<div class="paese-card"><div class="paese-card-header"><span class="paese-card-icon">${cr.icon}</span><div><div class="paese-card-titolo">${cr.titolo}</div><div class="paese-card-sottotitolo">${cr.sottotitolo}</div></div></div><div class="paese-card-body"><div class="dati-grid">${datiHtml}</div><div class="paese-desc">${cr.desc}</div></div></div>`;
   const pool=OBIETTIVI.filter(x=>x.id!==o.id);
   const shuffled=pool.sort(()=>Math.random()-0.5).slice(0,3);
   const scelte=[o,...shuffled].sort(()=>Math.random()-0.5);
-  document.getElementById('obiettivi-scelta').innerHTML=scelte.map(c=>`
-    <div class="ob-choice" id="obchoice-${c.id}" onclick="selectObChoice(${c.id})">
-      <span class="ob-choice-num">Obiettivo ${c.id}</span>
-      <div class="ob-choice-title">${c.title}</div>
-      <div class="ob-choice-pop">${c.popDesc}</div>
-    </div>`).join('');
+  document.getElementById('obiettivi-scelta').innerHTML=scelte.map(c=>`<div class="ob-choice" id="obchoice-${c.id}" onclick="selectObChoice(${c.id})"><span class="ob-choice-num">Obiettivo ${c.id}</span><div class="ob-choice-title">${c.title}</div><div class="ob-choice-pop">${c.popDesc}</div></div>`).join('');
 }
 
 function selectObChoice(id){
@@ -602,30 +532,17 @@ function confermaScelta(){
     else if(eid===euristicaScelta&&!correct) el.classList.add('wrong');
   });
   const wrongNote=!correct?`<div class="reveal-wrong-note">Hai scelto un'altra carta — ma nessun problema! Leggi la spiegazione qui sotto per capire il collegamento corretto.</div>`:'';
-  document.getElementById('revealBox').innerHTML=`
-    <div class="reveal-header">
-      <span class="reveal-icon">${correct?'🎯':'💡'}</span>
-      <div>
-        <div class="reveal-titolo">${correct?'Esatto!':'La risposta corretta'}</div>
-        <div class="reveal-paese">Il paese era: ${cr.paese}</div>
-      </div>
-    </div>
-    <div class="reveal-body">${wrongNote}<div class="reveal-spiegazione">${cr.spiegazione}</div></div>`;
+  document.getElementById('revealBox').innerHTML=`<div class="reveal-header"><span class="reveal-icon">${correct?'🎯':'💡'}</span><div><div class="reveal-titolo">${correct?'Esatto!':'La risposta corretta'}</div><div class="reveal-paese">Il paese era: ${cr.paese}</div></div></div><div class="reveal-body">${wrongNote}<div class="reveal-spiegazione">${cr.spiegazione}</div></div>`;
   document.getElementById('revealBox').classList.add('visible');
   document.getElementById('confermaBtn').style.display='none';
   document.getElementById('btnDopoReveal').style.display='block';
   document.getElementById('revealBox').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ════════════════════════════════════════════════════════════
-// AI FEEDBACK
-// ════════════════════════════════════════════════════════════
+// ── AI FEEDBACK via proxy Vercel ──
 async function requestFeedback(qNum) {
   const risposta = document.getElementById('r'+qNum).value.trim();
-  if (!risposta) {
-    alert('Scrivi prima la tua risposta, poi chiedi il feedback.');
-    return;
-  }
+  if (!risposta) { alert('Scrivi prima la tua risposta, poi chiedi il feedback.'); return; }
 
   const btn = document.getElementById('aibtn'+qNum);
   const thinking = document.getElementById('aithink'+qNum);
@@ -640,73 +557,46 @@ async function requestFeedback(qNum) {
   const p = assignedPolitica;
   const cr = CASI_REALI[o.id];
 
-  // Costruisci il prompt contestuale per ogni domanda
   let prompt = '';
-
   if (qNum === 4) {
     prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
 
-Lo studente aveva la carta obiettivo "${o.title}" (popolazione iniziale: ${o.pop.b} bambini, ${o.pop.a} adulti, ${o.pop.z} anziani; scenario: "${o.scenario.replace(/[^\w\s'àèéìòù.,!?–—]/g, '')}").
+Lo studente aveva la carta obiettivo "${o.title}" (popolazione iniziale: ${o.pop.b} bambini, ${o.pop.a} adulti, ${o.pop.z} anziani; scenario: "${o.scenario.replace(/[^\w\s'àèéìòù.,!?–—]/g,'')}").
 Il paese reale corrispondente era: ${cr.paese} (${cr.titolo}).
 
-Domanda posta allo studente: "In cosa si assomigliavano la tua città nel gioco e il paese reale che hai scoperto? Pensa alla composizione della popolazione, ai problemi, alle sfide."
+Domanda: "In cosa si assomigliavano la tua città nel gioco e il paese reale che hai scoperto?"
 
 Risposta dello studente: "${risposta}"
 
-Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Regole:
-- Se la risposta coglie il collegamento essenziale, dillo chiaramente e valorizzalo.
-- Se manca un collegamento logico importante (es. lo studente descrive solo il gioco senza parlare del paese reale, o viceversa), fai notare cosa manca con una domanda o osservazione, senza giudicare.
-- Non esigere perfezione formale o sintattica.
-- Se la risposta è vaga ma non sbagliata, puoi suggerire un dettaglio da aggiungere.
-- Parla direttamente allo studente, in italiano, con tono amichevole e diretto.
-- Non inventare informazioni sul paese o sul gioco che non ti sono state fornite.
-- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Se la risposta coglie il collegamento essenziale, dillo chiaramente. Se manca un passaggio logico importante, fallo notare con una domanda. Non esigere perfezione formale. Parla direttamente allo studente, in italiano, tono amichevole. Scrivi in forma discorsiva, senza elenchi puntati.`;
   }
-
   if (qNum === 5) {
     prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
 
 Lo studente aveva la carta politica "${p.title}" (effetto nel gioco: "${p.effetto}"; problema che risolve: "${p.problema}").
-Il paese reale associato alla sua carta obiettivo era: ${cr.paese}.
+Il paese reale era: ${cr.paese}.
 
-Domanda posta allo studente: "Nella realtà uno Stato potrebbe usare una misura simile a questa carta? Spiega come funzionerebbe davvero e se secondo te sarebbe efficace."
+Domanda: "Nella realtà uno Stato potrebbe usare una misura simile? Spiega come funzionerebbe e se sarebbe efficace."
 
 Risposta dello studente: "${risposta}"
 
-Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Regole:
-- Se lo studente descrive una misura reale coerente con la carta (anche adattata), valorizzalo.
-- Se la risposta rimane troppo astratta o ripete solo quello che c'è scritto sulla carta senza trasporla nella realtà, invita lo studente a fare un esempio concreto.
-- Se c'è un errore logico evidente (es. confonde cause ed effetti, o propone misure che contraddicono l'obiettivo), fallo notare con una domanda.
-- Non esigere perfezione formale.
-- Parla direttamente allo studente, in italiano, tono amichevole.
-- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+Dai un feedback breve (3-5 frasi) adatto a un tredicenne. Se la risposta descrive una misura reale coerente con la carta, valorizzala. Se rimane troppo astratta, invita a fare un esempio concreto. Se c'è un errore logico evidente, fallo notare con una domanda. Parla direttamente allo studente, in italiano, tono amichevole. Scrivi in forma discorsiva, senza elenchi puntati.`;
   }
-
   if (qNum === 6) {
     prompt = `Sei un assistente di supporto per studenti di scuola media (terza media, 13-14 anni) che stanno riflettendo su un gioco didattico sulla demografia chiamato Demopoli.
 
-Domanda posta allo studente: "L'Italia ha oggi uno dei tassi di natalità più bassi al mondo e una popolazione sempre più anziana. Usando quello che hai imparato nel gioco, spiega: quali conseguenze ha questa situazione sull'economia e sui servizi pubblici? Cosa potrebbe fare lo Stato?"
+Domanda: "L'Italia ha uno dei tassi di natalità più bassi al mondo e una popolazione sempre più anziana. Quali conseguenze ha questa situazione sull'economia e sui servizi pubblici? Cosa potrebbe fare lo Stato?"
 
 Risposta dello studente: "${risposta}"
 
-Dai un feedback breve (3-6 frasi) adatto a un tredicenne. Regole:
-- Questa è la domanda di ragionamento più importante: non c'è una risposta unica.
-- Se lo studente fa un ragionamento coerente — anche parziale — valorizzalo esplicitamente.
-- Se manca un passaggio logico importante (es. dice "ci sono pochi giovani" ma non collega alle conseguenze economiche, o propone soluzioni senza spiegarne il meccanismo), fai notare cosa manca con una domanda aperta.
-- Se usa termini come saldo naturale, piramide della popolazione, spesa pubblica in modo corretto, riconoscilo.
-- Se li usa in modo impreciso o sbagliato, correggilo gentilmente.
-- Non esigere un saggio: apprezza il ragionamento anche se espresso semplicemente.
-- Parla direttamente allo studente, in italiano, tono amichevole e diretto.
-- Non usare elenchi puntati, scrivi in forma discorsiva.`;
+Dai un feedback breve (3-6 frasi) adatto a un tredicenne. Se il ragionamento è coerente — anche parziale — valorizzalo. Se manca un passaggio logico, fallo notare con una domanda aperta. Se usa termini tecnici correttamente, riconoscilo; se li usa in modo impreciso, correggilo gentilmente. Non esigere un saggio. Parla direttamente allo studente, in italiano, tono amichevole. Scrivi in forma discorsiva, senza elenchi puntati.`;
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -717,14 +607,9 @@ Dai un feedback breve (3-6 frasi) adatto a un tredicenne. Regole:
     thinking.classList.remove('visible');
     feedbackBody.innerHTML = text.replace(/\n/g, '<br>');
     feedbackBox.classList.add('visible');
-
-    // Aggiorna il testo del pulsante
-    btn.textContent = '↺ Nuovo feedback';
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Nuovo feedback`;
     btn.disabled = false;
-
     feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
   } catch (e) {
     thinking.classList.remove('visible');
     feedbackBody.innerHTML = 'Errore di connessione. Controlla la rete e riprova.';
@@ -733,9 +618,6 @@ Dai un feedback breve (3-6 frasi) adatto a un tredicenne. Regole:
   }
 }
 
-// ════════════════════════════════════════════════════════════
-// NAVIGAZIONE
-// ════════════════════════════════════════════════════════════
 let currentStep = 0;
 function goNext(from){
   if(!validateStep(from)) return;
@@ -751,9 +633,6 @@ function showStep(n){
   currentStep=n; updateDots(n);
 }
 
-// ════════════════════════════════════════════════════════════
-// OPZIONI
-// ════════════════════════════════════════════════════════════
 function selectOpt(label,name,val){
   document.querySelectorAll(`[name="${name}"]`).forEach(r=>r.closest('.option-label').classList.remove('selected'));
   label.classList.add('selected'); answers[name]=val;
@@ -762,9 +641,6 @@ function selectOpt(label,name,val){
   if(err) err.style.display='none';
 }
 
-// ════════════════════════════════════════════════════════════
-// VALIDAZIONE
-// ════════════════════════════════════════════════════════════
 function validateStep(step){
   if(step===0){
     let ok=true;
@@ -812,9 +688,6 @@ function validateStep(step){
   return true;
 }
 
-// ════════════════════════════════════════════════════════════
-// INVIO
-// ════════════════════════════════════════════════════════════
 const optLabels={
   r1:{a:'Saldo migratorio',b:'Saldo naturale',c:'Tasso di natalità',d:'Indice di dipendenza'},
   r2:{a:'Grafico a torta',b:'Istogramma semplice',c:'Piramide della popolazione',d:'Diagramma di flusso'},
@@ -825,13 +698,11 @@ async function submitForm(){
   const btn=document.getElementById('sendBtn');
   btn.disabled=true; btn.textContent='Invio in corso…';
   document.getElementById('sendError').style.display='none';
-
   const nome=document.getElementById('nome').value.trim();
   const classe=document.getElementById('classe').value.trim();
   const data=document.getElementById('data').value.trim()||new Date().toLocaleDateString('it-IT');
   const o=assignedObiettivo, p=assignedPolitica, cr=CASI_REALI[o.id];
   const indovinato=(euristicaScelta===o.id)?'Sì':'No';
-
   const body={
     _subject:`Demopoli — Scheda di ${nome} (${classe})`,
     Studente:nome, Classe:classe, Data:data,
@@ -850,15 +721,9 @@ async function submitForm(){
     'Val. — Momento interessante':document.getElementById('v3').value.trim()||'—',
     'Val. — Cosa cambierei':document.getElementById('v4').value.trim()||'—',
   };
-
   const FORMSPREE_ID='xnjrjpby';
-
   try{
-    const res=await fetch(`https://formspree.io/f/${FORMSPREE_ID}`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(body)
-    });
+    const res=await fetch(`https://formspree.io/f/${FORMSPREE_ID}`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
     if(res.ok){
       document.getElementById('mainContainer').style.display='none';
       document.getElementById('successScreen').classList.add('visible');
